@@ -12,7 +12,7 @@ for controlling the display.
 
 ## Connection
 
-The ADS1X15 use the I2C or SPI interface. The connection depends on the interface used 
+The SH1106 supports next to thers the I2C or SPI interface. The connection depends on the interface used 
 and the number of devices in the system. Especially the ESP8266 with their small 
 number of GPIO ports may require optimization.
 
