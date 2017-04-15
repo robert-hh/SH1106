@@ -90,7 +90,7 @@ class SH1106:
         self.external_vcc = external_vcc
         self.pages = self.height // 8
         self.buffer = bytearray(self.pages * self.width)
-        self.framebuf = framebuf.FrameBuffer1(self.buffer, self.width, self.height, framebuf.MVLSB)
+        self.framebuf = framebuf.FrameBuffer(self.buffer, self.width, self.height, framebuf.MVLSB)
         self.init_display()
 
     def init_display(self):
