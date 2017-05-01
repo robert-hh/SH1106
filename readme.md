@@ -2,33 +2,33 @@
 
 This driver consists mostly of the work of Radomir Dopieralski (@deshipu).
 I added a few functions and changed the existing ones so it matches better
-my needs for a project. 
+my needs for a project.
 
 ## Features
 
-Use OLED display with the SH1106 driver with SPI or I2C. It is based on the MicroPython 
-framebuffer class and consists wrappers for this class as well as special methods 
+Use OLED display with the SH1106 driver with SPI or I2C. It is based on the MicroPython
+framebuffer class and consists wrappers for this class as well as special methods
 for controlling the display.
 
 ## Connection
 
-The SH1106 supports next to thers the I2C or SPI interface. The connection depends on the interface used 
-and the number of devices in the system. Especially the ESP8266 with their small 
+The SH1106 supports next to thers the I2C or SPI interface. The connection depends on the interface used
+and the number of devices in the system. Especially the ESP8266 with their small
 number of GPIO ports may require optimization.
 
 ### I2C
-SCL and SDA have to be connected as minimum. The driver also resets the device by the reser PIN. 
+SCL and SDA have to be connected as minimum. The driver also resets the device by the reser PIN.
 If your are low on GPIO ports, reset can be applied by a dedicated circuit, like the MCP100-300.
 
 ### SPI
-SCLK, MOSI, D/C are always required. If the display is the only SPI device in the set-up, 
-CS may be tied to GND. Reset has also to be connected, unless it is driven 
+SCLK, MOSI, D/C are always required. If the display is the only SPI device in the set-up,
+CS may be tied to GND. Reset has also to be connected, unless it is driven
 by an external circuit.
 
 
 ## Class
 
-The driver contains the SH1106 class and the derived SH1106_I2C and SH1106_SPI classes. 
+The driver contains the SH1106 class and the derived SH1106_I2C and SH1106_SPI classes.
 Besides the constructors, the methods are the same.
 
 ### I2C
@@ -47,13 +47,13 @@ If it is not needed, 'None' has to be supplied.
 display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs)
 ```
 - width and height define the size of the display
-- spi is an SPI object, which has to be created beforehand and tells the ports for SCLJ and MOSI. 
+- spi is an SPI object, which has to be created beforehand and tells the ports for SCLJ and MOSI.
 MISO is not used.
 - dc is the GPIO Pin object for the Data/Command selection. It will be initialized by the driver.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
 If it is not needed, 'None' has to be supplied.
 - cs is the GPIO Pin object for the CS connection. It will be initialized by the driver.
-If it is not needed, it can be set to 'None' or omitted. In this case the default value 
+If it is not needed, it can be set to 'None' or omitted. In this case the default value
 of 'None' applies.
 
 
@@ -73,24 +73,24 @@ display.poweron()
 display.poweroff()
 display.sleep(state)
 ```
-Enable and disable the display. display.sleep(True) is identical to display.poweroff(), 
+Enable and disable the display. display.sleep(True) is identical to display.poweroff(),
 display.sleep(False) is equivalent to display.poweron().
-Other than the literal meaning could tell, it does not switch the power line(Vcc) 
+Other than the literal meaning could tell, it does not switch the power line(Vcc)
 of the display.
 
 ###  display.contrast()
 
 ```
-display.contrast(channel, rate)
+display.contrast(level)
 ```
-Set the display's contrast to the given level. The range is 0..255. For a single color 
+Set the display's contrast to the given level. The range is 0..255. For a single color
 display like the SH1106, this is actually the brightness.
 
 ###  display.invert()
 ```
 display.invert(flag)
 ```
-Invert the content of the display, depending on the value of Flag. This is immediately 
+Invert the content of the display, depending on the value of Flag. This is immediately
 effective for the whole display.
 - flag = True  Invert
 - flag = False Normal mode
@@ -101,7 +101,7 @@ Display the content of the frame buffer on the display.
 ```
 display.show()
 ```
-The usual program flow would set-up/update the frame buffer content with a sequence of calls 
+The usual program flow would set-up/update the frame buffer content with a sequence of calls
 an the call display.show() for the content to be shown (see examples below).
 
 ###  display.fill()
@@ -119,7 +119,7 @@ Fill a rectangular area of the frame buffer.
 ```
 display.fill_rect(x, y, width, height, val)
 ```
-- x, y: upper left coordinate of the rectangular area. The values are 0-based. 0,0 is the 
+- x, y: upper left coordinate of the rectangular area. The values are 0-based. 0,0 is the
 to upper left pixel of the display
 - width, height: Width and height of the area in pixels.
 - val: the value to be set (0 or 1)
@@ -131,8 +131,8 @@ Draw a line.
 ```
 display.line(x1, y1, x2, y1, val)
 ```
-Display a line between the coordinates x1,y1 and x1, y2 with the color val (0 or 1). 
-x1,y1 and x2, y2 are the zero based pixel coordinates with 0,0 at the 
+Display a line between the coordinates x1,y1 and x1, y2 with the color val (0 or 1).
+x1,y1 and x2, y2 are the zero based pixel coordinates with 0,0 at the
 top left edge of the display.
 
 ## display.pixel()
@@ -148,8 +148,8 @@ Scroll the framebuffer content by dx and dy
 ```
 display.scroll(dx, dy)
 ```
-The framebuffer content is scrolled by dx pixels horizontally and dx pixels vertically. The content 
-of the frame buffer rotates. If you want the content to 'roll off' the screen, you have to clear the 
+The framebuffer content is scrolled by dx pixels horizontally and dx pixels vertically. The content
+of the frame buffer rotates. If you want the content to 'roll off' the screen, you have to clear the
 wrapped area with fill_rect().
 
 ## display.text()
@@ -157,10 +157,10 @@ Display text.
 ```
 display.text(string, x, y, val)
 ```
-Display the text in string at the coordinates x,y. The text is displayed with the built-in 
-8x8 pixel font, which support the ASCII character set values 32..127. The text overlays 
-the previous content; 'on' pixels in a character will not overwrite existing 'off' pixels. 
-If you want to rewrite an area of the screen, you have to clear it beforehand, 
+Display the text in string at the coordinates x,y. The text is displayed with the built-in
+8x8 pixel font, which support the ASCII character set values 32..127. The text overlays
+the previous content; 'on' pixels in a character will not overwrite existing 'off' pixels.
+If you want to rewrite an area of the screen, you have to clear it beforehand,
 e.g. with the fill_rect() method.
 
 Remark: If you want to use other font styles and sizes, have a look at
@@ -170,7 +170,7 @@ the work of Peter Hinch (@pythoncoder) at https://github.com/peterhinch/micropyt
 ```
 display.reset()
 ```
-Attempt to reset the display by toggling the reset line. This is obviously only effective 
+Attempt to reset the display by toggling the reset line. This is obviously only effective
 is reset is connected. Otherwise it's a No-Op.
 
 
@@ -188,9 +188,9 @@ is reset is connected. Otherwise it's a No-Op.
 #   - D8 - GPIO 4   - CS (optional, if the only connected device)
 #   - D2 - GPIO 5   - D/C
 #   - D1 - GPIO 2   - Res (required, unless a Hardware reset circuit is connected)
-# 
+#
 # for CS, D/C and Res other ports may be chosen.
-# 
+#
 from machine import Pin, SPI
 import sh1106
 
@@ -205,7 +205,7 @@ display.show()
 
 ```
 # MicroPython SH1106 OLED driver
-# 
+#
 # Pin Map I2C
 #   - 3v - xxxxxx   - Vcc
 #   - G  - xxxxxx   - Gnd
@@ -216,7 +216,7 @@ display.show()
 #   - G  - xxxxxx     D/C
 #
 # Pin's for I2C can be set almost arbitrary
-# 
+#
 from machine import Pin, I2C
 import sh1106
 
