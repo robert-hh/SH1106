@@ -70,7 +70,7 @@
 # display.show()
 
 from micropython import const
-import time
+import utime as time
 import framebuf
 
 
@@ -178,7 +178,7 @@ class SH1106_I2C(SH1106):
         super().reset(self.res)
 
 class SH1106_SPI(SH1106):
-    def __init__(self, width, height, spi, dc, res, cs, external_vcc=False):
+    def __init__(self, width, height, spi, dc, res, cs = None, external_vcc=False):
         self.rate = 10 * 1000 * 1000
         dc.init(dc.OUT, value=0)
         if res is not None:
