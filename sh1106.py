@@ -144,11 +144,11 @@ class SH1106:
 
     def reset(self, res):
         if res is not None:
-            res.high()
+            res(1)
             time.sleep_ms(1)
-            res.low()
+            res(0)
             time.sleep_ms(20)
-            res.high()
+            res(1)
             time.sleep_ms(20)
 
 class SH1106_I2C(SH1106):
@@ -157,6 +157,10 @@ class SH1106_I2C(SH1106):
         self.addr = addr
         self.res = res
         self.temp = bytearray(2)
+        if hasattr(self.i2c, "start"):
+            self.write_data = self.sw_write_data
+        else:
+            self.write_data = self.hw_write_data
         if res is not None:
             res.init(res.OUT, value=1)
         super().__init__(width, height, external_vcc)
@@ -166,7 +170,10 @@ class SH1106_I2C(SH1106):
         self.temp[1] = cmd
         self.i2c.writeto(self.addr, self.temp)
 
-    def write_data(self, buf):
+    def hw_write_data(self, buf):
+        self.i2c.writeto(self.addr, b'\x40'+buf)
+
+    def sw_write_data(self, buf):
         self.temp[0] = self.addr << 1
         self.temp[1] = 0x40 # Co=0, D/C#=1
         self.i2c.start()
@@ -194,25 +201,25 @@ class SH1106_SPI(SH1106):
     def write_cmd(self, cmd):
         self.spi.init(baudrate=self.rate, polarity=0, phase=0)
         if self.cs is not None:
-            self.cs.high()
-            self.dc.low()
-            self.cs.low()
+            self.cs(1)
+            self.dc(0)
+            self.cs(0)
             self.spi.write(bytearray([cmd]))
-            self.cs.high()
+            self.cs(1)
         else:
-            self.dc.low()
+            self.dc(0)
             self.spi.write(bytearray([cmd]))
 
     def write_data(self, buf):
         self.spi.init(baudrate=self.rate, polarity=0, phase=0)
         if self.cs is not None:
-            self.cs.high()
-            self.dc.high()
-            self.cs.low()
+            self.cs(1)
+            self.dc(1)
+            self.cs(0)
             self.spi.write(buf)
-            self.cs.high()
+            self.cs(1)
         else:
-            self.dc.high()
+            self.dc(1)
             self.spi.write(buf)
         
     def reset(self):
