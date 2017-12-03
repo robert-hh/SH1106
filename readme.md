@@ -95,6 +95,15 @@ effective for the whole display.
 - flag = True  Invert
 - flag = False Normal mode
 
+###  display.rotate()
+```
+display.rotate(flag)
+```
+Rotate the content of the display, depending on the value of Flag.
+This is immediately effective for the whole display.
+- flag = True  Rotate by 180 degree
+- flag = False Normal mode
+
 ###  display.show()
 
 Display the content of the frame buffer on the display.

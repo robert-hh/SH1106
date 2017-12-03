@@ -33,9 +33,9 @@
 #   - D8 - GPIO 4   - CS (optional, if the only connected device)
 #   - D2 - GPIO 5   - D/C
 #   - D1 - GPIO 2   - Res
-# 
+#
 # for CS, D/C and Res other ports may be chosen.
-# 
+#
 # from machine import Pin, SPI
 # import sh1106
 
@@ -47,7 +47,7 @@
 # display.show()
 #
 # --------------- I2C ------------------
-# 
+#
 # Pin Map I2C
 #   - 3v - xxxxxx   - Vcc
 #   - G  - xxxxxx   - Gnd
@@ -58,7 +58,7 @@
 #   - G  - xxxxxx     D/C
 #
 # Pin's for I2C can be set almost arbitrary
-# 
+#
 # from machine import Pin, I2C
 # import sh1106
 #
@@ -78,6 +78,8 @@ import framebuf
 _SET_CONTRAST        = const(0x81)
 _SET_NORM_INV        = const(0xa6)
 _SET_DISP            = const(0xae)
+_SET_SCAN_DIR        = const(0xc0)
+_SET_SEG_REMAP       = const(0xa0)
 _LOW_COLUMN_ADDRESS  = const(0x00)
 _HIGH_COLUMN_ADDRESS = const(0x10)
 _SET_PAGE_ADDRESS    = const(0xB0)
@@ -104,6 +106,14 @@ class SH1106:
 
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
+
+    def rotate(self, flag):
+        if flag:
+            self.write_cmd(_SET_SEG_REMAP | 0x01) # mirror display vertically
+            self.write_cmd(_SET_SCAN_DIR | 0x08) # mirror display horizontically
+        else:
+            self.write_cmd(_SET_SEG_REMAP | 0x00) #
+            self.write_cmd(_SET_SCAN_DIR | 0x00) #
 
     def sleep(self, value):
         self.write_cmd(_SET_DISP | (not value))
@@ -180,7 +190,7 @@ class SH1106_I2C(SH1106):
         self.i2c.write(self.temp)
         self.i2c.write(buf)
         self.i2c.stop()
-        
+
     def reset(self):
         super().reset(self.res)
 
@@ -221,7 +231,7 @@ class SH1106_SPI(SH1106):
         else:
             self.dc(1)
             self.spi.write(buf)
-        
+
     def reset(self):
         super().reset(self.res)
 
