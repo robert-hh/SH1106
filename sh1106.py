@@ -101,6 +101,10 @@ class SH1106:
         self.poweron()
         self.show()
 
+    def flipvertical(self):
+        self.write_cmd(const(0xA1)) # Mirror display veritically
+        self.write_cmd(const(0xC8)) # 180deg display rotation
+
     def poweroff(self):
         self.write_cmd(_SET_DISP | 0x00)
 
