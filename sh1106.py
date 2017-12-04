@@ -119,13 +119,15 @@ class SH1106:
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
 
-    def rotate(self, flag):
+    def rotate(self, flag, update = True):
         if flag:
             self.write_cmd(_SET_SEG_REMAP | 0x01) # mirror display vertically
             self.write_cmd(_SET_SCAN_DIR | 0x08) # mirror display horizontically
         else:
             self.write_cmd(_SET_SEG_REMAP | 0x00) #
             self.write_cmd(_SET_SCAN_DIR | 0x00) #
+        if update:
+            self.show()
 
     def sleep(self, value):
         self.write_cmd(_SET_DISP | (not value))

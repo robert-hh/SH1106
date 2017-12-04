@@ -97,13 +97,12 @@ effective for the whole display.
 
 ###  display.rotate()
 ```
-display.rotate(flag)
+display.rotate(flag[, update=True])
 ```
 Rotate the content of the display, depending on the value of Flag.
-To become fully effective, you have to run display.show(). Otherwise,
-the display is only vertically fliped.
-- flag = True  Rotate by 180 degree
-- flag = False Normal mode
+To become fully effective, you have to run display.show(). If the parameter update is True, show() is called by the function itself.
+- flag = True: Rotate by 180 degree
+- flag = False: Normal mode  
 
 ###  display.show()
 
@@ -116,7 +115,7 @@ an the call display.show() for the content to be shown (see examples below).
 
 ## Framebuffer Methods
 
-The below listed display methods of the framebuffer class are mirrored in this 
+The below listed display methods of the framebuffer class are mirrored in this
 class. For a documentation, please look into the MicroPython documentation at http://docs.micropython.org/en/latest/pyboard/library/framebuf.html?highlight=framebuf#module-framebuf:
 
 - fill
