@@ -100,7 +100,8 @@ effective for the whole display.
 display.rotate(flag)
 ```
 Rotate the content of the display, depending on the value of Flag.
-This is immediately effective for the whole display.
+To become fully effective, you have to run display.show(). Otherwise,
+the display is only vertically fliped.
 - flag = True  Rotate by 180 degree
 - flag = False Normal mode
 
@@ -113,60 +114,23 @@ display.show()
 The usual program flow would set-up/update the frame buffer content with a sequence of calls
 an the call display.show() for the content to be shown (see examples below).
 
-###  display.fill()
+## Framebuffer Methods
 
-Fill the entire frame buffer with value.
-```
-display.fill(value)
-```
-Value is the pixel value (0 or 1). display.fill(0) would clear the entire frame buffer.
+The below listed display methods of the framebuffer class are mirrored in this 
+class. For a documentation, please look into the MicroPython documentation at http://docs.micropython.org/en/latest/pyboard/library/framebuf.html?highlight=framebuf#module-framebuf:
+
+- fill
+- fill_rect
+- line
+- vline
+- hline
+- pixel
+- scroll
+- text
+- blit
 
 
-###  display.fill_rect()
-
-Fill a rectangular area of the frame buffer.
-```
-display.fill_rect(x, y, width, height, val)
-```
-- x, y: upper left coordinate of the rectangular area. The values are 0-based. 0,0 is the
-to upper left pixel of the display
-- width, height: Width and height of the area in pixels.
-- val: the value to be set (0 or 1)
-
-display.fill() can be used to clear a partial area of the screen for updates.
-
-### display.line()
-Draw a line.
-```
-display.line(x1, y1, x2, y1, val)
-```
-Display a line between the coordinates x1,y1 and x1, y2 with the color val (0 or 1).
-x1,y1 and x2, y2 are the zero based pixel coordinates with 0,0 at the
-top left edge of the display.
-
-## display.pixel()
-Set a pixel.
-```
-display.pixel(x, y, val)
-```
-Set a pixel at coordinate x,y with the color val (0 or 1). x,y is the zero based
-pixel coordinates with 0,0 at the top left edge of the display.
-
-## display.scroll()
-Scroll the framebuffer content by dx and dy
-```
-display.scroll(dx, dy)
-```
-The framebuffer content is scrolled by dx pixels horizontally and dx pixels vertically. The content
-of the frame buffer rotates. If you want the content to 'roll off' the screen, you have to clear the
-wrapped area with fill_rect().
-
-## display.text()
-Display text.
-```
-display.text(string, x, y, val)
-```
-Display the text in string at the coordinates x,y. The text is displayed with the built-in
+The text is displayed with the built-in
 8x8 pixel font, which support the ASCII character set values 32..127. The text overlays
 the previous content; 'on' pixels in a character will not overwrite existing 'off' pixels.
 If you want to rewrite an area of the screen, you have to clear it beforehand,

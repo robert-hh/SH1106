@@ -92,7 +92,19 @@ class SH1106:
         self.external_vcc = external_vcc
         self.pages = self.height // 8
         self.buffer = bytearray(self.pages * self.width)
-        self.framebuf = framebuf.FrameBuffer(self.buffer, self.width, self.height, framebuf.MVLSB)
+        fb = framebuf.FrameBuffer(self.buffer, self.width, self.height, framebuf.MVLSB)
+        self.framebuf = fb
+# set shortcuts for the methods of framebuf
+        self.fill = fb.fill
+        self.fill_rect = fb.fill_rect
+        self.hline = fb.hline
+        self.vline = fb.vline
+        self.line = fb.line
+        self.pixel = fb.pixel
+        self.scroll = fb.scroll
+        self.text = fb.text
+        self.blit = fb.blit
+
         self.init_display()
 
     def init_display(self):
@@ -133,24 +145,6 @@ class SH1106:
             self.write_data(self.buffer[
                 self.width * page:self.width * page + self.width
             ])
-
-    def fill(self, val):
-        self.framebuf.fill(val)
-
-    def fill_rect(self, x, y, width, height, val):
-        self.framebuf.fill_rect(x, y, width, height, val)
-
-    def line(self, x1, y1, x2, y2, val):
-        self.framebuf.line(x1, y1, x2, y2, val)
-
-    def pixel(self, x, y, col):
-        self.framebuf.pixel(x, y, col)
-
-    def scroll(self, dx, dy):
-        self.framebuf.scroll(dx, dy)
-
-    def text(self, string, x, y, col=1):
-        self.framebuf.text(string, x, y, col)
 
     def reset(self, res):
         if res is not None:
