@@ -51,7 +51,8 @@ display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs)
 MISO is not used.
 - dc is the GPIO Pin object for the Data/Command selection. It will be initialized by the driver.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
-If it is not needed, 'None' has to be supplied.
+If it is not needed, it can be set to 'None' or omitted. In this case the default value
+of 'None' applies.
 - cs is the GPIO Pin object for the CS connection. It will be initialized by the driver.
 If it is not needed, it can be set to 'None' or omitted. In this case the default value
 of 'None' applies.

@@ -158,7 +158,7 @@ class SH1106:
             time.sleep_ms(20)
 
 class SH1106_I2C(SH1106):
-    def __init__(self, width, height, i2c, res, addr=0x3c, external_vcc=False):
+    def __init__(self, width, height, i2c, res=None, addr=0x3c, external_vcc=False):
         self.i2c = i2c
         self.addr = addr
         self.res = res
@@ -191,7 +191,7 @@ class SH1106_I2C(SH1106):
         super().reset(self.res)
 
 class SH1106_SPI(SH1106):
-    def __init__(self, width, height, spi, dc, res, cs = None, external_vcc=False):
+    def __init__(self, width, height, spi, dc, res=None, cs=None, external_vcc=False):
         self.rate = 10 * 1000 * 1000
         dc.init(dc.OUT, value=0)
         if res is not None:
