@@ -124,6 +124,7 @@ class. For a documentation, please look into the MicroPython documentation at ht
 - line
 - vline
 - hline
+- rect
 - pixel
 - scroll
 - text

@@ -100,6 +100,7 @@ class SH1106:
         self.hline = fb.hline
         self.vline = fb.vline
         self.line = fb.line
+        self.rect = fb.rect
         self.pixel = fb.pixel
         self.scroll = fb.scroll
         self.text = fb.text
