@@ -3,7 +3,8 @@
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2016 Radomir Dopieralski (@deshipu), 2017 Robert Hammelrath (@robert-hh)
+# Copyright (c) 2016 Radomir Dopieralski (@deshipu),
+#               2017 Robert Hammelrath (@robert-hh)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +93,8 @@ class SH1106:
         self.external_vcc = external_vcc
         self.pages = self.height // 8
         self.buffer = bytearray(self.pages * self.width)
-        fb = framebuf.FrameBuffer(self.buffer, self.width, self.height, framebuf.MVLSB)
+        fb = framebuf.FrameBuffer(self.buffer, self.width, self.height,
+                                  framebuf.MVLSB)
         self.framebuf = fb
 # set shortcuts for the methods of framebuf
         self.fill = fb.fill
@@ -120,13 +122,13 @@ class SH1106:
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
 
-    def rotate(self, flag, update = True):
+    def rotate(self, flag, update=True):
         if flag:
-            self.write_cmd(_SET_SEG_REMAP | 0x01) # mirror display vertically
-            self.write_cmd(_SET_SCAN_DIR | 0x08) # mirror display horizontically
+            self.write_cmd(_SET_SEG_REMAP | 0x01)  # mirror display vertically
+            self.write_cmd(_SET_SCAN_DIR | 0x08)  # mirror display hor.
         else:
-            self.write_cmd(_SET_SEG_REMAP | 0x00) #
-            self.write_cmd(_SET_SCAN_DIR | 0x00) #
+            self.write_cmd(_SET_SEG_REMAP | 0x00)
+            self.write_cmd(_SET_SCAN_DIR | 0x00)
         if update:
             self.show()
 
@@ -158,8 +160,10 @@ class SH1106:
             res(1)
             time.sleep_ms(20)
 
+
 class SH1106_I2C(SH1106):
-    def __init__(self, width, height, i2c, res=None, addr=0x3c, external_vcc=False):
+    def __init__(self, width, height, i2c, res=None, addr=0x3c,
+                 external_vcc=False):
         self.i2c = i2c
         self.addr = addr
         self.res = res
@@ -173,7 +177,7 @@ class SH1106_I2C(SH1106):
         super().__init__(width, height, external_vcc)
 
     def write_cmd(self, cmd):
-        self.temp[0] = 0x80 # Co=1, D/C#=0
+        self.temp[0] = 0x80  # Co=1, D/C#=0
         self.temp[1] = cmd
         self.i2c.writeto(self.addr, self.temp)
 
@@ -182,7 +186,7 @@ class SH1106_I2C(SH1106):
 
     def sw_write_data(self, buf):
         self.temp[0] = self.addr << 1
-        self.temp[1] = 0x40 # Co=0, D/C#=1
+        self.temp[1] = 0x40  # Co=0, D/C#=1
         self.i2c.start()
         self.i2c.write(self.temp)
         self.i2c.write(buf)
@@ -191,8 +195,10 @@ class SH1106_I2C(SH1106):
     def reset(self):
         super().reset(self.res)
 
+
 class SH1106_SPI(SH1106):
-    def __init__(self, width, height, spi, dc, res=None, cs=None, external_vcc=False):
+    def __init__(self, width, height, spi, dc, res=None, cs=None,
+                 external_vcc=False):
         self.rate = 10 * 1000 * 1000
         dc.init(dc.OUT, value=0)
         if res is not None:
@@ -231,4 +237,3 @@ class SH1106_SPI(SH1106):
 
     def reset(self):
         super().reset(self.res)
-
