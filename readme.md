@@ -38,7 +38,7 @@ display = sh1106.SH1106_I2C(width, height, i2c, reset, address)
 - width and height define the size of the display
 - i2c is an I2C object, which has to be created beforehand and tells the ports for SDA and SCL.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
-If it is not needed, 'None' has to be supplied.
+If it is not needed, `None` has to be supplied.
 - adr is the I2C address of the display. Default 0x3c or 60
 
 
@@ -51,11 +51,11 @@ display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs)
 MISO is not used.
 - dc is the GPIO Pin object for the Data/Command selection. It will be initialized by the driver.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
-If it is not needed, it can be set to 'None' or omitted. In this case the default value
-of 'None' applies.
+If it is not needed, it can be set to `None` or omitted. In this case the default value
+of `None` applies.
 - cs is the GPIO Pin object for the CS connection. It will be initialized by the driver.
-If it is not needed, it can be set to 'None' or omitted. In this case the default value
-of 'None' applies.
+If it is not needed, it can be set to `None` or omitted. In this case the default value
+of `None` applies.
 
 
 ## Methods
@@ -65,7 +65,7 @@ of 'None' applies.
 display.init_display()
 ```
 Initializes the display, fills it with the color 0 and displays the empty screen. It also tries
-to apply the reset signal, if it is connected ( = not None).
+to apply the reset signal, if it is connected ( = not `None`).
 
 ### display.power_on() and display.power_off()
 
