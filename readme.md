@@ -17,7 +17,7 @@ and the number of devices in the system. Especially the ESP8266 with their small
 number of GPIO ports may require optimization.
 
 ### I2C
-SCL and SDA have to be connected as minimum. The driver also resets the device by the reser PIN.
+SCL and SDA have to be connected as minimum. The driver also resets the device by the reset PIN.
 If your are low on GPIO ports, reset can be applied by a dedicated circuit, like the MCP100-300.
 
 ### SPI
@@ -74,8 +74,8 @@ display.poweron()
 display.poweroff()
 display.sleep(state)
 ```
-Enable and disable the display. display.sleep(True) is identical to display.poweroff(),
-display.sleep(False) is equivalent to display.poweron().
+Enable and disable the display. `display.sleep(True)` is identical to `display.poweroff()`,
+`display.sleep(False)` is equivalent to `display.poweron()`.
 Other than the literal meaning could tell, it does not switch the power line(Vcc)
 of the display.
 
@@ -135,7 +135,7 @@ The text is displayed with the built-in
 8x8 pixel font, which support the ASCII character set values 32..127. The text overlays
 the previous content; 'on' pixels in a character will not overwrite existing 'off' pixels.
 If you want to rewrite an area of the screen, you have to clear it beforehand,
-e.g. with the fill_rect() method.
+e.g. with the `fill_rect()` method.
 
 Remark: If you want to use other font styles and sizes, have a look at
 the work of Peter Hinch (@pythoncoder) at https://github.com/peterhinch/micropython-font-to-py
