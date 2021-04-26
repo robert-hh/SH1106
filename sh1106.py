@@ -24,7 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# Sample code sections
+# Sample code sections for ESP8266 pin assignments
 # ------------ SPI ------------------
 # Pin Map SPI
 #   - 3v - xxxxxx   - Vcc

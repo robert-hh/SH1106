@@ -154,7 +154,7 @@ is reset is connected. Otherwise it's a No-Op.
 ```
 # MicroPython SH1106 OLED driver
 #
-# Pin Map SPI
+# Pin Map SPI for ESP8266
 #   - 3v - xxxxxx   - Vcc
 #   - G  - xxxxxx   - Gnd
 #   - D7 - GPIO 13  - Din / MOSI fixed
@@ -180,7 +180,7 @@ display.show()
 ```
 # MicroPython SH1106 OLED driver
 #
-# Pin Map I2C
+# Pin Map I2C for ESP8266
 #   - 3v - xxxxxx   - Vcc
 #   - G  - xxxxxx   - Gnd
 #   - D2 - GPIO 5   - SCK / SCL
