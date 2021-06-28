@@ -87,15 +87,16 @@ _SET_PAGE_ADDRESS    = const(0xB0)
 
 
 class SH1106:
-    def __init__(self, width, height, external_vcc, rotate90=False):
+    def __init__(self, width, height, external_vcc, rotate=0):
         self.width = width
         self.height = height
         self.external_vcc = external_vcc
-        self.rotate90 = rotate90
+        self.flip_en = rotate == 180 or rotate == 270
+        self.rotate90 = rotate == 90 or rotate == 270
         self.pages = self.height // 8
         self.bufsize = self.pages * self.width
         self.renderbuf = bytearray(self.bufsize)
-        if rotate90:
+        if self.rotate90:
             self.displaybuf = bytearray(self.bufsize)
             # HMSB is required to keep the bit order in the render buffer
             # compatible with byte-for-byte remapping to the display buffer,
@@ -129,7 +130,7 @@ class SH1106:
         self.fill(0)
         self.poweron()
         # rotate90 requires a call to flip() for setting up.
-        self.flip(False)
+        self.flip(self.flip_en)
 
     def poweroff(self):
         self.write_cmd(_SET_DISP | 0x00)
@@ -137,11 +138,14 @@ class SH1106:
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
 
-    def flip(self, flag, update=True):
+    def flip(self, flag=None, update=True):
+        if flag is None:
+            flag = not self.flip_en
         mir_v = flag ^ self.rotate90
         mir_h = flag
         self.write_cmd(_SET_SEG_REMAP | (0x01 if mir_v else 0x00))
         self.write_cmd(_SET_SCAN_DIR | (0x08 if mir_h else 0x00))
+        self.flip_en = flag
         if update:
             self.show()
 
@@ -180,14 +184,14 @@ class SH1106:
 
 class SH1106_I2C(SH1106):
     def __init__(self, width, height, i2c, res=None, addr=0x3c,
-                 rotate90=False, external_vcc=False):
+                 rotate=0, external_vcc=False):
         self.i2c = i2c
         self.addr = addr
         self.res = res
         self.temp = bytearray(2)
         if res is not None:
             res.init(res.OUT, value=1)
-        super().__init__(width, height, external_vcc, rotate90)
+        super().__init__(width, height, external_vcc, rotate)
 
     def write_cmd(self, cmd):
         self.temp[0] = 0x80  # Co=1, D/C#=0
@@ -203,7 +207,7 @@ class SH1106_I2C(SH1106):
 
 class SH1106_SPI(SH1106):
     def __init__(self, width, height, spi, dc, res=None, cs=None,
-                 rotate90=False, external_vcc=False):
+                 rotate=0, external_vcc=False):
         self.rate = 10 * 1000 * 1000
         dc.init(dc.OUT, value=0)
         if res is not None:
@@ -214,7 +218,7 @@ class SH1106_SPI(SH1106):
         self.dc = dc
         self.res = res
         self.cs = cs
-        super().__init__(width, height, external_vcc, rotate90)
+        super().__init__(width, height, external_vcc, rotate)
 
     def write_cmd(self, cmd):
         self.spi.init(baudrate=self.rate, polarity=0, phase=0)
