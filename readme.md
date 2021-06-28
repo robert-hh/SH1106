@@ -10,6 +10,17 @@ Use OLED display with the SH1106 driver with SPI or I2C. It is based on the Micr
 framebuffer class and consists wrappers for this class as well as special methods
 for controlling the display.
 
+### 90° Rotation
+
+The `rotate90` parameter in the constructor allows you to rotate the display by 90 degrees.
+However, this comes at a price: Since we will have to it in software, a second, internal framebuffer
+will be created, using an additional `width * height / 8` bytes of RAM. Also, each call to `show()`
+will take about 33% longer.
+
+If you would like to use this feature, keep `width` and `height` in the constructor unchanged, i.e.
+set to the _physical_ dimensions of your display. Also, it is currently not possible to toggle 90°
+rotation on or off dynamically, you will have to make your decision in the constructor.
+
 ## Connection
 
 The SH1106 supports next to thers the I2C or SPI interface. The connection depends on the interface used
@@ -33,18 +44,19 @@ Besides the constructors, the methods are the same.
 
 ### I2C
 ```
-display = sh1106.SH1106_I2C(width, height, i2c, reset, address)
+display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate90)
 ```
 - width and height define the size of the display
 - i2c is an I2C object, which has to be created beforehand and tells the ports for SDA and SCL.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
 If it is not needed, `None` has to be supplied.
 - adr is the I2C address of the display. Default 0x3c or 60
+- rotate90 will rotate the display by 90 degrees, see above. Defaults to `False`.
 
 
 ### SPI
 ```
-display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs)
+display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs, rotate90)
 ```
 - width and height define the size of the display
 - spi is an SPI object, which has to be created beforehand and tells the ports for SCLJ and MOSI.
@@ -56,6 +68,7 @@ of `None` applies.
 - cs is the GPIO Pin object for the CS connection. It will be initialized by the driver.
 If it is not needed, it can be set to `None` or omitted. In this case the default value
 of `None` applies.
+- rotate90 will rotate the display by 90 degrees, see above. Defaults to `False`.
 
 
 ## Methods
@@ -96,14 +109,16 @@ effective for the whole display.
 - flag = True  Invert
 - flag = False Normal mode
 
-###  display.rotate()
+###  display.flip()
 ```
-display.rotate(flag[, update=True])
+display.flip(flag[, update=True])
 ```
-Rotate the content of the display, depending on the value of Flag.
+Rotate the content of the display 180 degrees, depending on the value of Flag.
 To become fully effective, you have to run display.show(). If the parameter update is True, show() is called by the function itself.
 - flag = True: Rotate by 180 degree
-- flag = False: Normal mode  
+- flag = False: Normal mode
+This setting can be combined with the `rotate90` setting in order to rotate the display's contents
+by 270 degrees.
 
 ###  display.show()
 
