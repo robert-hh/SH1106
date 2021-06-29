@@ -87,16 +87,31 @@ _SET_PAGE_ADDRESS    = const(0xB0)
 
 
 class SH1106:
-    def __init__(self, width, height, external_vcc):
+    def __init__(self, width, height, external_vcc, rotate=0):
         self.width = width
         self.height = height
         self.external_vcc = external_vcc
+        self.flip_en = rotate == 180 or rotate == 270
+        self.rotate90 = rotate == 90 or rotate == 270
         self.pages = self.height // 8
-        self.buffer = bytearray(self.pages * self.width)
-        fb = framebuf.FrameBuffer(self.buffer, self.width, self.height,
-                                  framebuf.MVLSB)
-        self.framebuf = fb
-# set shortcuts for the methods of framebuf
+        self.bufsize = self.pages * self.width
+        self.renderbuf = bytearray(self.bufsize)
+        if self.rotate90:
+            self.displaybuf = bytearray(self.bufsize)
+            # HMSB is required to keep the bit order in the render buffer
+            # compatible with byte-for-byte remapping to the display buffer,
+            # which is in VLSB. Else we'd have to copy bit-by-bit!
+            fb = framebuf.FrameBuffer(self.renderbuf, self.height, self.width,
+                                      framebuf.MONO_HMSB)
+        else:
+            self.displaybuf = self.renderbuf
+            fb = framebuf.FrameBuffer(self.renderbuf, self.width, self.height,
+                                      framebuf.MONO_VLSB)
+
+        # flip() was called rotate() once, provide backwards compatibility.
+        self.rotate = self.flip
+
+        # set shortcuts for the methods of framebuf
         self.fill = fb.fill
         self.fill_rect = fb.fill_rect
         self.hline = fb.hline
@@ -114,7 +129,8 @@ class SH1106:
         self.reset()
         self.fill(0)
         self.poweron()
-        self.show()
+        # rotate90 requires a call to flip() for setting up.
+        self.flip(self.flip_en)
 
     def poweroff(self):
         self.write_cmd(_SET_DISP | 0x00)
@@ -122,13 +138,14 @@ class SH1106:
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
 
-    def rotate(self, flag, update=True):
-        if flag:
-            self.write_cmd(_SET_SEG_REMAP | 0x01)  # mirror display vertically
-            self.write_cmd(_SET_SCAN_DIR | 0x08)  # mirror display hor.
-        else:
-            self.write_cmd(_SET_SEG_REMAP | 0x00)
-            self.write_cmd(_SET_SCAN_DIR | 0x00)
+    def flip(self, flag=None, update=True):
+        if flag is None:
+            flag = not self.flip_en
+        mir_v = flag ^ self.rotate90
+        mir_h = flag
+        self.write_cmd(_SET_SEG_REMAP | (0x01 if mir_v else 0x00))
+        self.write_cmd(_SET_SCAN_DIR | (0x08 if mir_h else 0x00))
+        self.flip_en = flag
         if update:
             self.show()
 
@@ -143,13 +160,17 @@ class SH1106:
         self.write_cmd(_SET_NORM_INV | (invert & 1))
 
     def show(self):
+        # self.* lookups in loops take significant time (~4fps).
+        (w, p, db, rb) = (self.width, self.pages,
+                          self.displaybuf, self.renderbuf)
+        if self.rotate90:
+            for i in range(self.bufsize):
+                db[w * (i % p) + (i // p)] = rb[i]
         for page in range(self.height // 8):
             self.write_cmd(_SET_PAGE_ADDRESS | page)
             self.write_cmd(_LOW_COLUMN_ADDRESS | 2)
             self.write_cmd(_HIGH_COLUMN_ADDRESS | 0)
-            self.write_data(self.buffer[
-                self.width * page:self.width * page + self.width
-            ])
+            self.write_data(db[(w*page):(w*page+w)])
 
     def reset(self, res):
         if res is not None:
@@ -163,14 +184,14 @@ class SH1106:
 
 class SH1106_I2C(SH1106):
     def __init__(self, width, height, i2c, res=None, addr=0x3c,
-                 external_vcc=False):
+                 rotate=0, external_vcc=False):
         self.i2c = i2c
         self.addr = addr
         self.res = res
         self.temp = bytearray(2)
         if res is not None:
             res.init(res.OUT, value=1)
-        super().__init__(width, height, external_vcc)
+        super().__init__(width, height, external_vcc, rotate)
 
     def write_cmd(self, cmd):
         self.temp[0] = 0x80  # Co=1, D/C#=0
@@ -186,7 +207,7 @@ class SH1106_I2C(SH1106):
 
 class SH1106_SPI(SH1106):
     def __init__(self, width, height, spi, dc, res=None, cs=None,
-                 external_vcc=False):
+                 rotate=0, external_vcc=False):
         self.rate = 10 * 1000 * 1000
         dc.init(dc.OUT, value=0)
         if res is not None:
@@ -197,7 +218,7 @@ class SH1106_SPI(SH1106):
         self.dc = dc
         self.res = res
         self.cs = cs
-        super().__init__(width, height, external_vcc)
+        super().__init__(width, height, external_vcc, rotate)
 
     def write_cmd(self, cmd):
         self.spi.init(baudrate=self.rate, polarity=0, phase=0)

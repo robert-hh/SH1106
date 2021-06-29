@@ -10,6 +10,22 @@ Use OLED display with the SH1106 driver with SPI or I2C. It is based on the Micr
 framebuffer class and consists wrappers for this class as well as special methods
 for controlling the display.
 
+### Content Rotation
+
+The `rotate` parameter in the constructor allows you to rotate the display by a 90, 180 or 270
+degrees clockwise. 180 degrees are easy, because this can be done using only hardware flags of the
+SH1106 display. 90 and 270 degrees however are not. These come at a price: Since we will have to it
+in software, a second, internal framebuffer will be created, using an additional
+`width * height / 8` bytes of RAM. Also, each call to `show()` will take about 33% longer.
+
+Set `width` and `height` in the constructor to the _physical_ dimensions of your display, regardless
+of how you would like to rotate it.
+
+You can use the `flip()` method to toggle between 0 and 180 degrees of rotation, or between 90 and
+270 degrees, at runtime, which is equivalent to rotating the contents for 180 degrees compared to
+whatever the rotation was before. It is however not possible to switch from "portrait" to
+"landscape" or vice versa at runtime, because of the additional buffer required.
+
 ## Connection
 
 The SH1106 supports next to thers the I2C or SPI interface. The connection depends on the interface used
@@ -33,18 +49,19 @@ Besides the constructors, the methods are the same.
 
 ### I2C
 ```
-display = sh1106.SH1106_I2C(width, height, i2c, reset, address)
+display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate=0)
 ```
 - width and height define the size of the display
 - i2c is an I2C object, which has to be created beforehand and tells the ports for SDA and SCL.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
 If it is not needed, `None` has to be supplied.
 - adr is the I2C address of the display. Default 0x3c or 60
+- rotate defines display content rotation. See above for details and caveats.
 
 
 ### SPI
 ```
-display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs)
+display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs, rotate=0)
 ```
 - width and height define the size of the display
 - spi is an SPI object, which has to be created beforehand and tells the ports for SCLJ and MOSI.
@@ -56,6 +73,7 @@ of `None` applies.
 - cs is the GPIO Pin object for the CS connection. It will be initialized by the driver.
 If it is not needed, it can be set to `None` or omitted. In this case the default value
 of `None` applies.
+- rotate defines display content rotation. See above for details and caveats.
 
 
 ## Methods
@@ -96,14 +114,18 @@ effective for the whole display.
 - flag = True  Invert
 - flag = False Normal mode
 
-###  display.rotate()
+###  display.flip()
 ```
-display.rotate(flag[, update=True])
+display.flip([flag=None[, update=True]])
 ```
-Rotate the content of the display, depending on the value of Flag.
-To become fully effective, you have to run display.show(). If the parameter update is True, show() is called by the function itself.
-- flag = True: Rotate by 180 degree
-- flag = False: Normal mode  
+Rotate the content of the display an additional 180 degrees, depending on the value of `flag`.
+
+- `True`: If you selected 0 or 90 degrees of rotation in the constructor, rotation will be set to 180 or 270, respectively. Else, it has no effect.
+- `False`: If you selected 180 or 270 degrees of rotation in the constructor, rotation will be set to 0 or 90, respectively. Else, it has no effect.
+- `None`: Toggle flip on or off: 0 degrees will become 180, 90 will become 270, 180 will become 0 and 270 will become 90.
+
+To become fully effective, you have to run `display.show()`. If the parameter `update` is `True`,
+`show()` is called by the function itself.
 
 ###  display.show()
 
