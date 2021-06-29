@@ -4,7 +4,8 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2016 Radomir Dopieralski (@deshipu),
-#               2017 Robert Hammelrath (@robert-hh)
+#               2017-2021 Robert Hammelrath (@robert-hh)
+#               2021 Tim Weber (@scy)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
