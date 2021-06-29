@@ -13,7 +13,7 @@ for controlling the display.
 ### Content Rotation
 
 The `rotate` parameter in the constructor allows you to rotate the display by a 90, 180 or 270
-degrees clockwise. 0 and 180 degrees are easy, because they can be done using hardware flags of the
+degrees clockwise. 180 degrees are easy, because this can be done using only hardware flags of the
 SH1106 display. 90 and 270 degrees however are not. These come at a price: Since we will have to it
 in software, a second, internal framebuffer will be created, using an additional
 `width * height / 8` bytes of RAM. Also, each call to `show()` will take about 33% longer.
@@ -49,19 +49,19 @@ Besides the constructors, the methods are the same.
 
 ### I2C
 ```
-display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate90)
+display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate=0)
 ```
 - width and height define the size of the display
 - i2c is an I2C object, which has to be created beforehand and tells the ports for SDA and SCL.
 - res is the GPIO Pin object for the reset connection. It will be initialized by the driver.
 If it is not needed, `None` has to be supplied.
 - adr is the I2C address of the display. Default 0x3c or 60
-- rotate90 will rotate the display by 90 degrees, see above. Defaults to `False`.
+- rotate defines display content rotation. See above for details and caveats.
 
 
 ### SPI
 ```
-display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs, rotate90)
+display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs, rotate=0)
 ```
 - width and height define the size of the display
 - spi is an SPI object, which has to be created beforehand and tells the ports for SCLJ and MOSI.
@@ -73,7 +73,7 @@ of `None` applies.
 - cs is the GPIO Pin object for the CS connection. It will be initialized by the driver.
 If it is not needed, it can be set to `None` or omitted. In this case the default value
 of `None` applies.
-- rotate90 will rotate the display by 90 degrees, see above. Defaults to `False`.
+- rotate defines display content rotation. See above for details and caveats.
 
 
 ## Methods
