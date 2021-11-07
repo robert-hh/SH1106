@@ -87,7 +87,7 @@ _HIGH_COLUMN_ADDRESS = const(0x10)
 _SET_PAGE_ADDRESS    = const(0xB0)
 
 
-class SH1106:
+class SH1106(framebuf.FrameBuffer):
     def __init__(self, width, height, external_vcc, rotate=0):
         self.width = width
         self.height = height
@@ -102,28 +102,15 @@ class SH1106:
             # HMSB is required to keep the bit order in the render buffer
             # compatible with byte-for-byte remapping to the display buffer,
             # which is in VLSB. Else we'd have to copy bit-by-bit!
-            fb = framebuf.FrameBuffer(self.renderbuf, self.height, self.width,
-                                      framebuf.MONO_HMSB)
+            super().__init__(self.renderbuf, self.height, self.width,
+                             framebuf.MONO_HMSB)
         else:
             self.displaybuf = self.renderbuf
-            fb = framebuf.FrameBuffer(self.renderbuf, self.width, self.height,
-                                      framebuf.MONO_VLSB)
+            super().__init__(self.renderbuf, self.width, self.height,
+                             framebuf.MONO_VLSB)
 
         # flip() was called rotate() once, provide backwards compatibility.
         self.rotate = self.flip
-
-        # set shortcuts for the methods of framebuf
-        self.fill = fb.fill
-        self.fill_rect = fb.fill_rect
-        self.hline = fb.hline
-        self.vline = fb.vline
-        self.line = fb.line
-        self.rect = fb.rect
-        self.pixel = fb.pixel
-        self.scroll = fb.scroll
-        self.text = fb.text
-        self.blit = fb.blit
-
         self.init_display()
 
     def init_display(self):
