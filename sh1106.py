@@ -88,6 +88,8 @@ _SET_PAGE_ADDRESS    = const(0xB0)
 
 
 class SH1106(framebuf.FrameBuffer):
+    pages_to_update = []
+
     def __init__(self, width, height, external_vcc, rotate=0):
         self.width = width
         self.height = height
@@ -135,7 +137,7 @@ class SH1106(framebuf.FrameBuffer):
         self.write_cmd(_SET_SCAN_DIR | (0x08 if mir_h else 0x00))
         self.flip_en = flag
         if update:
-            self.show()
+            self.show(True) # full update
 
     def sleep(self, value):
         self.write_cmd(_SET_DISP | (not value))
@@ -147,18 +149,80 @@ class SH1106(framebuf.FrameBuffer):
     def invert(self, invert):
         self.write_cmd(_SET_NORM_INV | (invert & 1))
 
-    def show(self):
+    def show(self, full_update = False):
         # self.* lookups in loops take significant time (~4fps).
         (w, p, db, rb) = (self.width, self.pages,
                           self.displaybuf, self.renderbuf)
         if self.rotate90:
             for i in range(self.bufsize):
                 db[w * (i % p) + (i // p)] = rb[i]
-        for page in range(self.height // 8):
+        if full_update:
+            pages_to_update = range(self.height // 8)
+        else:
+            pages_to_update = self.pages_to_update
+        #print("Updating pages:", pages_to_update)
+        for page in pages_to_update:
             self.write_cmd(_SET_PAGE_ADDRESS | page)
             self.write_cmd(_LOW_COLUMN_ADDRESS | 2)
             self.write_cmd(_HIGH_COLUMN_ADDRESS | 0)
             self.write_data(db[(w*page):(w*page+w)])
+        self.pages_to_update = []
+
+    def pixel(self, x, y, color):
+        super().pixel(x, y, color)
+        page = y // 8
+        if page not in self.pages_to_update:
+            self.pages_to_update.append(page)
+
+    def text(self, text, x, y, color=1):
+        super().text(text, x, y, color)
+        self.register_updates(y, y+7)
+
+    def line(self, x0, y0, x1, y1, color):
+        super().line(x0, y0, x1, y1, color)
+        self.register_updates(y0, y1)
+
+    def hline(self, x, y, w, color):
+        super().hline(x, y, w, color)
+        self.register_updates(y)
+
+    def vline(self, x, y, h, color):
+        super().vline(x, y, h, color)
+        self.register_updates(y, y+h)
+
+    def fill(self, color):
+        super().fill(color)
+        self.pages_to_update = list(range(self.height//8))
+
+    def blit(self, fbuf, x, y, key=-1, palette=None):
+        super().blit(fbuf, x, y, key, palette)
+        self.register_updates(y, y+fbuf.height)
+
+    def scroll(self, x, y):
+        # my understanding is that scroll() does a full screen change
+        super().scroll(x, y)
+        self.pages_to_update = list(range(self.height//8))
+
+    def fill_rect(self, x, y, w, h, color):
+        super().fill_rect(x, y, w, h, color)
+        self.register_updates(y, y+h)
+
+    def rect(self, x, y, w, h, color):
+        super().rect(x, y, w, h, color)
+        self.register_updates(y, y+h)
+
+    def register_updates(self, y0, y1=None):
+        # this function takes the top and optional bottom address of the changes made
+        # and updates the pages_to_change list with any changed pages
+        # that are not yet on the list
+        start_page = y0 // 8
+        end_page = y1 // 8 if y1 is not None else start_page
+        # rearrange start_page and end_page if coordinates were given from bottom to top
+        if start_page > end_page:
+            start_page, end_page = end_page, start_page
+        for page in range(start_page, end_page+1):
+            if page not in self.pages_to_update:
+                self.pages_to_update.append(page)
 
     def reset(self, res):
         if res is not None:
