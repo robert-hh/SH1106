@@ -88,7 +88,6 @@ _SET_PAGE_ADDRESS    = const(0xB0)
 
 
 class SH1106(framebuf.FrameBuffer):
-    pages_to_update = []
 
     def __init__(self, width, height, external_vcc, rotate=0):
         self.width = width
@@ -99,6 +98,8 @@ class SH1106(framebuf.FrameBuffer):
         self.pages = self.height // 8
         self.bufsize = self.pages * self.width
         self.renderbuf = bytearray(self.bufsize)
+        self.pages_to_update = 0
+
         if self.rotate90:
             self.displaybuf = bytearray(self.bufsize)
             # HMSB is required to keep the bit order in the render buffer
@@ -157,22 +158,22 @@ class SH1106(framebuf.FrameBuffer):
             for i in range(self.bufsize):
                 db[w * (i % p) + (i // p)] = rb[i]
         if full_update:
-            pages_to_update = range(self.height // 8)
+            pages_to_update = (1 << self.pages) - 1
         else:
             pages_to_update = self.pages_to_update
-        #print("Updating pages:", pages_to_update)
-        for page in pages_to_update:
-            self.write_cmd(_SET_PAGE_ADDRESS | page)
-            self.write_cmd(_LOW_COLUMN_ADDRESS | 2)
-            self.write_cmd(_HIGH_COLUMN_ADDRESS | 0)
-            self.write_data(db[(w*page):(w*page+w)])
-        self.pages_to_update = []
+        #print("Updating pages: {:08b}".format(pages_to_update))
+        for page in range(self.pages):
+            if (pages_to_update & (1 << page)):
+                self.write_cmd(_SET_PAGE_ADDRESS | page)
+                self.write_cmd(_LOW_COLUMN_ADDRESS | 2)
+                self.write_cmd(_HIGH_COLUMN_ADDRESS | 0)
+                self.write_data(db[(w*page):(w*page+w)])
+        self.pages_to_update = 0
 
     def pixel(self, x, y, color):
         super().pixel(x, y, color)
         page = y // 8
-        if page not in self.pages_to_update:
-            self.pages_to_update.append(page)
+        self.pages_to_update |= 1 << page
 
     def text(self, text, x, y, color=1):
         super().text(text, x, y, color)
@@ -192,7 +193,7 @@ class SH1106(framebuf.FrameBuffer):
 
     def fill(self, color):
         super().fill(color)
-        self.pages_to_update = list(range(self.height//8))
+        self.pages_to_update = (1 << self.pages) - 1
 
     def blit(self, fbuf, x, y, key=-1, palette=None):
         super().blit(fbuf, x, y, key, palette)
@@ -201,7 +202,7 @@ class SH1106(framebuf.FrameBuffer):
     def scroll(self, x, y):
         # my understanding is that scroll() does a full screen change
         super().scroll(x, y)
-        self.pages_to_update = list(range(self.height//8))
+        self.pages_to_update =  (1 << self.pages) - 1
 
     def fill_rect(self, x, y, w, h, color):
         super().fill_rect(x, y, w, h, color)
@@ -221,8 +222,7 @@ class SH1106(framebuf.FrameBuffer):
         if start_page > end_page:
             start_page, end_page = end_page, start_page
         for page in range(start_page, end_page+1):
-            if page not in self.pages_to_update:
-                self.pages_to_update.append(page)
+            self.pages_to_update |= 1 << page
 
     def reset(self, res):
         if res is not None:
