@@ -197,7 +197,7 @@ class SH1106(framebuf.FrameBuffer):
 
     def blit(self, fbuf, x, y, key=-1, palette=None):
         super().blit(fbuf, x, y, key, palette)
-        self.register_updates(y, y+fbuf.height)
+        self.register_updates(y, y+self.height)
 
     def scroll(self, x, y):
         # my understanding is that scroll() does a full screen change
