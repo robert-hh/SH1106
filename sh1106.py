@@ -189,7 +189,7 @@ class SH1106(framebuf.FrameBuffer):
 
     def vline(self, x, y, h, color):
         super().vline(x, y, h, color)
-        self.register_updates(y, y+h)
+        self.register_updates(y, y+h-1)
 
     def fill(self, color):
         super().fill(color)
@@ -206,11 +206,11 @@ class SH1106(framebuf.FrameBuffer):
 
     def fill_rect(self, x, y, w, h, color):
         super().fill_rect(x, y, w, h, color)
-        self.register_updates(y, y+h)
+        self.register_updates(y, y+h-1)
 
     def rect(self, x, y, w, h, color):
         super().rect(x, y, w, h, color)
-        self.register_updates(y, y+h)
+        self.register_updates(y, y+h-1)
 
     def register_updates(self, y0, y1=None):
         # this function takes the top and optional bottom address of the changes made
