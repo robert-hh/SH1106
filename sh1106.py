@@ -170,10 +170,13 @@ class SH1106(framebuf.FrameBuffer):
                 self.write_data(db[(w*page):(w*page+w)])
         self.pages_to_update = 0
 
-    def pixel(self, x, y, color):
-        super().pixel(x, y, color)
-        page = y // 8
-        self.pages_to_update |= 1 << page
+    def pixel(self, x, y, c=None):
+        if c is None:
+            return super().pixel(x, y)
+        else:
+            super().pixel(x, y , c)
+            page = y // 8
+            self.pages_to_update |= 1 << page
 
     def text(self, text, x, y, color=1):
         super().text(text, x, y, color)
