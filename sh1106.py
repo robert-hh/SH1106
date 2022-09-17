@@ -128,6 +128,7 @@ class SH1106(framebuf.FrameBuffer):
 
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
+        time.sleep_ms(100)
 
     def flip(self, flag=None, update=True):
         if flag is None:
