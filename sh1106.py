@@ -129,7 +129,8 @@ class SH1106(framebuf.FrameBuffer):
 
     def poweron(self):
         self.write_cmd(_SET_DISP | 0x01)
-        time.sleep_ms(100)
+        if self.delay:
+            time.sleep_ms(self.delay)
 
     def flip(self, flag=None, update=True):
         if flag is None:
@@ -241,11 +242,12 @@ class SH1106(framebuf.FrameBuffer):
 
 class SH1106_I2C(SH1106):
     def __init__(self, width, height, i2c, res=None, addr=0x3c,
-                 rotate=0, external_vcc=False):
+                 rotate=0, external_vcc=False, delay=0):
         self.i2c = i2c
         self.addr = addr
         self.res = res
         self.temp = bytearray(2)
+        self.delay = delay
         if res is not None:
             res.init(res.OUT, value=1)
         super().__init__(width, height, external_vcc, rotate)
@@ -264,8 +266,7 @@ class SH1106_I2C(SH1106):
 
 class SH1106_SPI(SH1106):
     def __init__(self, width, height, spi, dc, res=None, cs=None,
-                 rotate=0, external_vcc=False):
-        self.rate = 10 * 1000 * 1000
+                 rotate=0, external_vcc=False, delay=0):
         dc.init(dc.OUT, value=0)
         if res is not None:
             res.init(res.OUT, value=0)
@@ -275,10 +276,10 @@ class SH1106_SPI(SH1106):
         self.dc = dc
         self.res = res
         self.cs = cs
+        self.delay = delay
         super().__init__(width, height, external_vcc, rotate)
 
     def write_cmd(self, cmd):
-        self.spi.init(baudrate=self.rate, polarity=0, phase=0)
         if self.cs is not None:
             self.cs(1)
             self.dc(0)
@@ -290,7 +291,6 @@ class SH1106_SPI(SH1106):
             self.spi.write(bytearray([cmd]))
 
     def write_data(self, buf):
-        self.spi.init(baudrate=self.rate, polarity=0, phase=0)
         if self.cs is not None:
             self.cs(1)
             self.dc(1)

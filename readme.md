@@ -49,7 +49,7 @@ Besides the constructors, the methods are the same.
 
 ### I2C
 ```
-display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate=0)
+display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate=0, delay=0)
 ```
 - width and height define the size of the display
 - i2c is an I2C object, which has to be created beforehand and tells the ports for SDA and SCL.
@@ -57,11 +57,12 @@ display = sh1106.SH1106_I2C(width, height, i2c, reset, address, rotate=0)
 If it is not needed, `None` has to be supplied.
 - adr is the I2C address of the display. Default 0x3c or 60
 - rotate defines display content rotation. See above for details and caveats.
+- delay specifies an optional delay during poweron. The quantity is ms.
 
 
 ### SPI
 ```
-display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs, rotate=0)
+display = sh1106.SH1106_SPI(width, height, spi, dc, res, cs, rotate=0, delay=0)
 ```
 - width and height define the size of the display
 - spi is an SPI object, which has to be created beforehand and tells the ports for SCLJ and MOSI.
@@ -74,6 +75,7 @@ of `None` applies.
 If it is not needed, it can be set to `None` or omitted. In this case the default value
 of `None` applies.
 - rotate defines display content rotation. See above for details and caveats.
+- delay specifies an optional delay during poweron. The quantity is ms.
 
 
 ## Methods
