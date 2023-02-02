@@ -222,8 +222,8 @@ class SH1106(framebuf.FrameBuffer):
         # this function takes the top and optional bottom address of the changes made
         # and updates the pages_to_change list with any changed pages
         # that are not yet on the list
-        start_page = y0 // 8
-        end_page = y1 // 8 if y1 is not None else start_page
+        start_page = max(0, y0 // 8)
+        end_page = max(0, y1 // 8) if y1 is not None else start_page
         # rearrange start_page and end_page if coordinates were given from bottom to top
         if start_page > end_page:
             start_page, end_page = end_page, start_page
