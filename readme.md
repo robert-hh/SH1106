@@ -4,6 +4,8 @@ This driver consists mostly of the work of Radomir Dopieralski (@deshipu).
 I added a few functions and changed the existing ones so it matches better
 my needs for a project.
 
+A modified version of this driver compatible with [nano-gui widget library](https://github.com/peterhinch/micropython-nano-gui) is hosted in that project.
+
 ## Features
 
 Use OLED display with the SH1106 driver with SPI or I2C. It is based on the MicroPython
