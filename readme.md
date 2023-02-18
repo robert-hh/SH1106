@@ -4,7 +4,7 @@ This driver consists mostly of the work of Radomir Dopieralski (@deshipu).
 I added a few functions and changed the existing ones so it matches better
 my needs for a project.
 
-A modified version of this drvier compatible with [nano-gui widget library](https://github.com/peterhinch/micropython-nano-gui) is hosted in that project.
+A modified version of this driver compatible with [nano-gui widget library](https://github.com/peterhinch/micropython-nano-gui) is hosted in that project.
 
 ## Features
 
