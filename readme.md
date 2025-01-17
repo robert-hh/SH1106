@@ -12,6 +12,12 @@ Use OLED display with the SH1106 driver with SPI or I2C. It is based on the Micr
 framebuffer class and consists wrappers for this class as well as special methods
 for controlling the display.
 
+## Type Stubs for IDE Support
+This library now includes `.pyi` type stubs for better IDE integration. To enable autocomplete and type checking in VS Code or other editors:
+- Ensure the `.pyi` files are in your project directory or accessible in your Python path.
+- If needed, add the directory to your IDE's settings (e.g., `python.analysis.extraPaths` in VS Code).
+- If you are using a virtual environment, ensure the stubs are installed in the virtual environment.
+
 ### Content Rotation
 
 The `rotate` parameter in the constructor allows you to rotate the display by a 90, 180 or 270
