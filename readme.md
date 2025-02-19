@@ -161,6 +161,7 @@ class. For a documentation, please look into the MicroPython documentation at ht
 - scroll
 - text
 - blit
+- ellipse
 
 
 The text is displayed with the built-in
