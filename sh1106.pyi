@@ -175,6 +175,10 @@ class SH1106(FrameBuffer):
         """Draw an outlined rectangle."""
         ...
 
+    def ellipse(self, x: int, y: int, xr: int, yr: int, color: int) -> None:
+        """Draw an outlined ellipse."""
+        ...
+
     def reset(self, res: Optional[Pin]) -> None:
         """Reset the display using the reset pin."""
         ...
