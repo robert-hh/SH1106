@@ -227,6 +227,10 @@ class SH1106(framebuf.FrameBuffer):
         super().rect(x, y, w, h, color)
         self.register_updates(y, y+h-1)
 
+    def ellipse(self, x, y, xr, yr, color):
+        super().ellipse(x, y, xr, yr, color)
+        self.register_updates(y-yr, y+yr-1)
+
     def register_updates(self, y0, y1=None):
         # this function takes the top and optional bottom address of the changes made
         # and updates the pages_to_change list with any changed pages
