@@ -41,7 +41,10 @@ For more details, visit the [SH1106 GitHub repository](https://github.com/robert
 """
 
 # sh1106.pyi - Stub file for SH1106 MicroPython library
-from typing import Optional
+from abc import abstractmethod
+from typing import Optional, overload
+
+from _typeshed import Incomplete
 from framebuf import FrameBuffer
 from machine import I2C, SPI, Pin
 
@@ -60,6 +63,12 @@ class SH1106(FrameBuffer):
         :param rotate: Rotation angle (0, 90, 180, 270 degrees).
         """
         ...
+
+    @abstractmethod
+    def write_cmd(self, *args, **kwargs) -> Incomplete: ...
+
+    @abstractmethod
+    def write_data(self,  *args, **kwargs) -> Incomplete: ...
 
     def init_display(self) -> None:
         """Initialize and reset the display."""
@@ -113,8 +122,18 @@ class SH1106(FrameBuffer):
         :param full_update: If True, update all pages; otherwise, update only modified pages.
         """
         ...
-
-    def pixel(self, x: int, y: int, color: Optional[int] = None) -> Optional[int]:
+    @overload
+    def pixel(self, x: int, y: int, /) -> int:
+        """
+        Get or set the color of a specific pixel.
+        
+        :param x: X-coordinate.
+        :param y: Y-coordinate.
+        :param color: Pixel color (0 or 1). If None, return the current color.
+        """
+        ...    
+    @overload
+    def pixel(self, x: int, y: int, color: int) -> None:
         """
         Get or set the color of a specific pixel.
         
@@ -175,7 +194,7 @@ class SH1106(FrameBuffer):
         """Draw an outlined rectangle."""
         ...
 
-    def reset(self, res: Optional[Pin]) -> None:
+    def reset(self, res: Optional[Pin]=None) -> None:
         """Reset the display using the reset pin."""
         ...
 
@@ -198,7 +217,7 @@ class SH1106_I2C(SH1106):
         """Write data to the display via I2C."""
         ...
 
-    def reset(self) -> None:
+    def reset(self, res: Optional[Pin]=None) -> None:
         """Reset the display via the reset pin (if available)."""
         ...
 
@@ -221,6 +240,6 @@ class SH1106_SPI(SH1106):
         """Write data to the display via SPI."""
         ...
 
-    def reset(self) -> None:
+    def reset(self, res: Optional[Pin]=None) -> None:
         """Reset the display via the reset pin (if available)."""
         ...

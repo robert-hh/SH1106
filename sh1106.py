@@ -99,6 +99,7 @@ class SH1106(framebuf.FrameBuffer):
         self.bufsize = self.pages * self.width
         self.renderbuf = bytearray(self.bufsize)
         self.pages_to_update = 0
+        self.delay = 0
 
         if self.rotate90:
             self.displaybuf = bytearray(self.bufsize)
@@ -115,6 +116,14 @@ class SH1106(framebuf.FrameBuffer):
         # flip() was called rotate() once, provide backwards compatibility.
         self.rotate = self.flip
         self.init_display()
+
+    # abstractmethod
+    def write_cmd(self, *args, **kwargs): 
+        raise NotImplementedError
+
+    # abstractmethod
+    def write_data(self,  *args, **kwargs):
+        raise NotImplementedError
 
     def init_display(self):
         self.reset()
@@ -230,7 +239,7 @@ class SH1106(framebuf.FrameBuffer):
         for page in range(start_page, end_page+1):
             self.pages_to_update |= 1 << page
 
-    def reset(self, res):
+    def reset(self, res=None):
         if res is not None:
             res(1)
             time.sleep_ms(1)
@@ -260,7 +269,7 @@ class SH1106_I2C(SH1106):
     def write_data(self, buf):
         self.i2c.writeto(self.addr, b'\x40'+buf)
 
-    def reset(self):
+    def reset(self,res=None):
         super().reset(self.res)
 
 
@@ -301,5 +310,5 @@ class SH1106_SPI(SH1106):
             self.dc(1)
             self.spi.write(buf)
 
-    def reset(self):
+    def reset(self, res=None):
         super().reset(self.res)
